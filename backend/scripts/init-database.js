@@ -42,28 +42,78 @@ async function initializeDatabase() {
 
     console.log('👤 导入用户数据...');
     try {
+      // 创建管理员用户
       await User.create({
         id: 1,
         username: 'admin',
         email: 'admin@example.com',
-        password: 'hashed_password',
+        passwordHash: 'hashed_password', // 使用正确的字段名
         role: 'admin',
+        isActive: true,
         createdAt: new Date(),
         updatedAt: new Date()
       });
-      console.log('✅ 默认用户创建成功');
+      console.log('✅ 管理员用户创建成功');
+      
+      // 创建演示用户
+      await User.create({
+        id: 2,
+        username: 'demo',
+        email: 'demo@example.com',
+        passwordHash: 'demo123', // 使用正确的字段名
+        role: 'user',
+        isActive: true,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      });
+      console.log('✅ 演示用户创建成功');
     } catch (err) {
       console.error('❌ 用户创建失败:', err.message);
     }
 
     console.log('📊 导入提示词数据...');
+    
+    console.log(`   原始数据统计:`);
+    console.log(`     - 移动App提示词: ${mobileAppPrompts.length} 个`);
+    console.log(`     - Web应用提示词: ${webAppPrompts.length} 个`);
+    console.log(`     - Web网站提示词: ${webWebsitePrompts.length} 个`);
+    
+    // 为每个来源的提示词添加正确的category
+    const mobileAppPromptsWithCategory = mobileAppPrompts.map(prompt => ({
+      ...prompt,
+      category: 'mobile-app', // 确保移动App提示词使用正确的分类
+      id: `mobile-${prompt.id}` // 为移动App提示词添加前缀避免ID冲突
+    }));
+    
+    const webAppPromptsWithCategory = webAppPrompts.map(prompt => ({
+      ...prompt,
+      category: 'web-app', // 修正Web应用提示词的分类
+      id: `webapp-${prompt.id}` // 为Web应用提示词添加前缀避免ID冲突
+    }));
+    
+    const webWebsitePromptsWithCategory = webWebsitePrompts.map(prompt => ({
+      ...prompt,
+      category: 'web-website', // 修正Web网站提示词的分类
+      id: `website-${prompt.id}` // 为Web网站提示词添加前缀避免ID冲突
+    }));
+    
     const allPrompts = [
-      ...mobileAppPrompts,
-      ...webAppPrompts,
-      ...webWebsitePrompts
+      ...mobileAppPromptsWithCategory,
+      ...webAppPromptsWithCategory,
+      ...webWebsitePromptsWithCategory
     ];
     
     console.log(`   总提示词数量: ${allPrompts.length}`);
+    
+    // 按分类分组统计
+    const categoryStats = allPrompts.reduce((acc, prompt) => {
+      acc[prompt.category] = (acc[prompt.category] || 0) + 1;
+      return acc;
+    }, {});
+    console.log(`   按分类统计:`);
+    Object.entries(categoryStats).forEach(([category, count]) => {
+      console.log(`     - ${category}: ${count} 个`);
+    });
     
     // 处理提示词数据，确保格式正确并映射字段名
     const processedPrompts = allPrompts.map(prompt => ({
@@ -82,9 +132,14 @@ async function initializeDatabase() {
     }));
     
     console.log(`   处理后提示词数量: ${processedPrompts.length}`);
-    if (processedPrompts.length > 0) {
-      console.log('   第一个提示词示例:', JSON.stringify(processedPrompts[0], null, 2).substring(0, 200) + '...');
-    }
+    // 显示各类别处理后的示例
+    const mobileExample = processedPrompts.find(p => p.categoryId === 'mobile-app');
+    const webappExample = processedPrompts.find(p => p.categoryId === 'web-app');
+    const websiteExample = processedPrompts.find(p => p.categoryId === 'web-website');
+    
+    if (mobileExample) console.log(`   移动App示例:`, { id: mobileExample.id, categoryId: mobileExample.categoryId, title: mobileExample.title.substring(0, 30) + '...' });
+    if (webappExample) console.log(`   Web应用示例:`, { id: webappExample.id, categoryId: webappExample.categoryId, title: webappExample.title.substring(0, 30) + '...' });
+    if (websiteExample) console.log(`   Web网站示例:`, { id: websiteExample.id, categoryId: websiteExample.categoryId, title: websiteExample.title.substring(0, 30) + '...' });
     
     // 分批导入提示词数据，避免内存问题
     let importedCount = 0;
