@@ -62,8 +62,10 @@
             
             <div class="relative">
               <button
-                @click="showUserMenu = !showUserMenu"
+                @click.stop="toggleUserMenu"
                 class="flex items-center space-x-2 p-2 rounded-lg hover:bg-gray-100"
+                :aria-expanded="showUserMenu"
+                aria-controls="user-dropdown-menu"
               >
                 <div class="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center">
                   <span class="text-gray-700 font-medium text-sm">
@@ -81,8 +83,9 @@
               <!-- 用户下拉菜单 -->
               <div
                 v-if="showUserMenu"
+                id="user-dropdown-menu"
                 class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-50"
-                v-click-outside="() => showUserMenu = false"
+                v-click-outside="closeUserMenu"
               >
                 <router-link
                   to="/profile"
@@ -187,6 +190,20 @@ const handleLogout = async () => {
   } catch (error) {
     console.error('退出登录失败:', error)
   }
+}
+
+// 切换用户菜单显示状态的函数
+const toggleUserMenu = () => {
+  console.log('切换菜单前状态:', showUserMenu.value)
+  showUserMenu.value = !showUserMenu.value
+  console.log('切换菜单后状态:', showUserMenu.value)
+  console.log('认证状态:', authStore.isAuthenticated)
+}
+
+// 关闭用户菜单的函数
+const closeUserMenu = () => {
+  showUserMenu.value = false
+  console.log('用户菜单已关闭')
 }
 
 // 点击外部关闭菜单指令

@@ -22,7 +22,7 @@ const registerSchema = Joi.object({
 
 // 登录验证模式
 const loginSchema = Joi.object({
-  username: Joi.string().required(),
+  identifier: Joi.string().required(),
   password: Joi.string().required()
 });
 
@@ -116,14 +116,14 @@ const login = async (req, res) => {
       });
     }
 
-    const { username, password } = value;
+    const { identifier, password } = value;
 
     // 查找用户（支持用户名或邮箱登录）
     const user = await User.findOne({
       where: {
         [Op.or]: [
-          { username },
-          { email: username }
+          { username: identifier },
+          { email: identifier }
         ]
       }
     });
@@ -208,13 +208,17 @@ const getCurrentUser = async (req, res) => {
 // 更新用户信息
 const updateProfile = async (req, res) => {
   try {
+    console.log('收到更新用户信息请求:', req.body);
+    
     const updateSchema = Joi.object({
       displayName: Joi.string().max(100).optional(),
+      email: Joi.string().email().optional(),
       avatarUrl: Joi.string().uri().optional()
     });
 
     const { error, value } = updateSchema.validate(req.body);
     if (error) {
+      console.log('参数验证失败:', error.details);
       return res.status(400).json({
         success: false,
         error: {
@@ -225,7 +229,24 @@ const updateProfile = async (req, res) => {
       });
     }
 
+    console.log('验证通过，准备更新用户信息:', value);
+    
+    // 如果更新邮箱，检查是否与其他用户冲突
+    if (value.email && value.email !== req.user.email) {
+      const existingUser = await User.findOne({ where: { email: value.email } });
+      if (existingUser) {
+        return res.status(409).json({
+          success: false,
+          error: {
+            code: 'EMAIL_EXISTS',
+            message: '邮箱已被其他用户使用'
+          }
+        });
+      }
+    }
+    
     await req.user.update(value);
+    console.log('用户信息更新成功:', req.user.id);
 
     res.json({
       success: true,
@@ -236,12 +257,13 @@ const updateProfile = async (req, res) => {
     });
 
   } catch (error) {
-    console.error('更新用户信息错误:', error);
+    console.error('更新用户信息错误:', error.message, error.stack);
     res.status(500).json({
       success: false,
       error: {
         code: 'INTERNAL_ERROR',
-        message: '服务器内部错误'
+        message: '服务器内部错误',
+        details: error.message
       }
     });
   }

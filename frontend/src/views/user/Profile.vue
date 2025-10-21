@@ -148,15 +148,62 @@ const form = reactive({
 const handleUpdateProfile = async () => {
   isLoading.value = true
   try {
-    // 这里实现更新个人资料的逻辑
-    console.log('更新个人资料:', form)
-    // 模拟API调用
-    await new Promise(resolve => setTimeout(resolve, 1000))
+    // 添加调试日志
+    console.log('API调用前的准备：', { tokenExists: !!authStore.token, displayName: form.displayName });
+    
+    // 发送更新请求到后端API，使用正确的后端端口3002
+    const response = await fetch('http://localhost:3002/api/v1/auth/profile', {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${authStore.token}`
+      },
+      body: JSON.stringify({
+        displayName: form.displayName,
+        email: form.email
+      })
+    })
+    
+    console.log('API响应状态码：', response.status);
+    
+    // 只读取一次JSON响应
+    let data;
+    try {
+      data = await response.json();
+      console.log('响应数据:', data);
+    } catch (jsonError) {
+      console.error('无法解析响应为JSON:', jsonError);
+      throw new Error(`无法解析响应: ${jsonError.message}`);
+    }
+    
+    // 检查响应数据中的success字段
+    if (!response.ok || (data && !data.success)) {
+      // 构建更详细的错误信息
+      let errorMessage;
+      if (data && data.error) {
+        errorMessage = `更新失败: ${data.error.message}`;
+        if (data.error.details) {
+          errorMessage += ` - 详情: ${data.error.details}`;
+        }
+        if (data.error.code) {
+          errorMessage += ` (错误代码: ${data.error.code})`;
+        }
+      } else {
+        errorMessage = `更新失败: HTTP ${response.status} ${response.statusText}`;
+      }
+      
+      console.error(errorMessage);
+      throw new Error(errorMessage);
+    }
     
     // 更新成功后重新获取用户信息
     await authStore.getCurrentUser()
+    
+    // 可以添加一个成功提示
+    console.log('个人资料更新成功')
   } catch (error) {
     console.error('更新个人资料失败:', error)
+    // 这里可以添加错误提示逻辑
   } finally {
     isLoading.value = false
   }

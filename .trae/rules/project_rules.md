@@ -1,1 +1,1 @@
-1. 终端命令运行环境在windows的powershell上
+终端命令环境：终端命令运行环境在windows的powershell上,不要使用&&
