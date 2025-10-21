@@ -1,0 +1,56 @@
+[
+  {
+    "id": "social-communication",
+    "name": "社交通讯类",
+    "categoryId": "mobile-app",
+    "description": "即时通讯、社交动态、语音聊天等社交通讯应用"
+  },
+  {
+    "id": "e-commerce-shopping",
+    "name": "电商购物类",
+    "categoryId": "mobile-app",
+    "description": "综合电商、时尚购物、生鲜电商等购物应用"
+  },
+  {
+    "id": "finance-investment",
+    "name": "金融理财类",
+    "categoryId": "mobile-app",
+    "description": "手机银行、投资理财、数字钱包等金融应用"
+  },
+  {
+    "id": "health-medical",
+    "name": "健康医疗类",
+    "categoryId": "mobile-app",
+    "description": "健康监测、在线问诊、用药提醒等医疗健康应用"
+  },
+  {
+    "id": "education-learning",
+    "name": "教育学习类",
+    "categoryId": "mobile-app",
+    "description": "在线学习、语言学习、儿童教育等教育应用"
+  },
+  {
+    "id": "lifestyle-services",
+    "name": "生活服务类",
+    "categoryId": "mobile-app",
+    "description": "外卖订餐、打车出行、酒店预订等生活服务应用"
+  },
+  {
+    "id": "entertainment-leisure",
+    "name": "娱乐休闲类",
+    "categoryId": "mobile-app",
+    "description": "短视频、音乐播放、游戏娱乐等娱乐应用"
+  },
+  {
+    "id": "productivity-tools",
+    "name": "工具效率类",
+    "categoryId": "mobile-app",
+    "description": "笔记、日历、任务管理等效率工具应用"
+  },
+  {
+    "id": "news-information",
+    "name": "新闻资讯类",
+    "categoryId": "mobile-app",
+    "description": "新闻阅读、财经资讯、体育资讯等资讯应用"
+  }
+]

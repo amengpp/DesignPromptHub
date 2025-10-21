@@ -1,0 +1,23 @@
+[
+  {
+    "id": "web-app",
+    "name": "Web应用业务系统",
+    "type": "Web应用",
+    "description": "面向企业级Web应用系统的UI设计提示词",
+    "count": 30
+  },
+  {
+    "id": "web-website",
+    "name": "Web网站",
+    "type": "Web网站",
+    "description": "面向各类Web网站的UI设计提示词",
+    "count": 30
+  },
+  {
+    "id": "mobile-app",
+    "name": "移动App",
+    "type": "移动应用",
+    "description": "面向移动设备App的UI设计提示词",
+    "count": 45
+  }
+]

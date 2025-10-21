@@ -1,0 +1,38 @@
+[
+  {
+    "id": "corporate-websites",
+    "name": "企业官网类",
+    "categoryId": "web-website",
+    "description": "科技公司、电商平台、教育平台等企业官方网站"
+  },
+  {
+    "id": "content-portals",
+    "name": "内容门户类",
+    "categoryId": "web-website",
+    "description": "新闻媒体、博客平台、知识百科等内容门户网站"
+  },
+  {
+    "id": "e-commerce",
+    "name": "电商购物类",
+    "categoryId": "web-website",
+    "description": "时尚电商、数码产品、美食外卖等电商网站"
+  },
+  {
+    "id": "social-networks",
+    "name": "社交网络类",
+    "categoryId": "web-website",
+    "description": "专业社交、兴趣社交、图片社交等社交网络平台"
+  },
+  {
+    "id": "online-education",
+    "name": "在线教育类",
+    "categoryId": "web-website",
+    "description": "在线课程、语言学习、职业技能等教育平台"
+  },
+  {
+    "id": "healthcare-medical",
+    "name": "医疗健康类",
+    "categoryId": "web-website",
+    "description": "在线医疗、健康管理、心理咨询等医疗健康平台"
+  }
+]

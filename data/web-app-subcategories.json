@@ -1,0 +1,32 @@
+[
+  {
+    "id": "enterprise-management",
+    "name": "企业管理系统类",
+    "categoryId": "web-app",
+    "description": "企业资源规划、客户关系管理、人力资源管理等企业级管理系统"
+  },
+  {
+    "id": "data-analytics",
+    "name": "数据分析系统类",
+    "categoryId": "web-app",
+    "description": "商业智能、用户行为分析、实时监控等数据分析系统"
+  },
+  {
+    "id": "office-collaboration",
+    "name": "办公协作系统类",
+    "categoryId": "web-app",
+    "description": "项目管理、团队协作、文档编辑等办公协作系统"
+  },
+  {
+    "id": "customer-service",
+    "name": "客户服务系统类",
+    "categoryId": "web-app",
+    "description": "在线客服、工单管理、客户反馈等客户服务系统"
+  },
+  {
+    "id": "industry-specific",
+    "name": "行业专用系统类",
+    "categoryId": "web-app",
+    "description": "电商、教育、医疗、物流等特定行业的管理系统"
+  }
+]
