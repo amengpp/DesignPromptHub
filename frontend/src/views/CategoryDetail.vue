@@ -24,16 +24,38 @@
 
         <!-- 子分类 -->
         <div v-if="subcategories.length > 0" class="mb-8">
-          <h2 class="text-xl font-semibold text-gray-900 mb-4">子分类</h2>
+          <div class="flex items-center justify-between mb-4">
+            <h2 class="text-xl font-semibold text-gray-900">子分类</h2>
+            <button
+              v-if="selectedSubcategory"
+              @click="clearSubcategoryFilter"
+              class="text-sm text-primary-600 hover:text-primary-700 font-medium"
+            >
+              清除筛选
+            </button>
+          </div>
           <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
             <div
               v-for="subcategory in subcategories"
               :key="subcategory.id"
-              class="card hover:shadow-lg transition-shadow cursor-pointer"
+              :class="[
+                'card hover:shadow-lg transition-shadow cursor-pointer',
+                selectedSubcategory?.id === subcategory.id 
+                  ? 'border-2 border-primary-500 bg-primary-50' 
+                  : 'border border-gray-200'
+              ]"
               @click="handleSubcategoryClick(subcategory)"
             >
               <div class="p-4">
-                <h3 class="font-semibold text-gray-900 mb-2">{{ subcategory.name }}</h3>
+                <div class="flex items-center justify-between mb-2">
+                  <h3 class="font-semibold text-gray-900">{{ subcategory.name }}</h3>
+                  <span 
+                    v-if="selectedSubcategory?.id === subcategory.id"
+                    class="text-primary-500"
+                  >
+                    ✓
+                  </span>
+                </div>
                 <p class="text-gray-600 text-sm line-clamp-2">{{ subcategory.description }}</p>
                 <div class="mt-3 text-sm text-gray-500">
                   {{ subcategory.promptCount || 0 }} 个提示词
@@ -46,7 +68,14 @@
         <!-- 提示词列表 -->
         <div>
           <div class="flex items-center justify-between mb-6">
-            <h2 class="text-xl font-semibold text-gray-900">提示词列表</h2>
+            <div class="flex items-center space-x-4">
+              <h2 class="text-xl font-semibold text-gray-900">
+                {{ selectedSubcategory ? selectedSubcategory.name + ' 的提示词' : '提示词列表' }}
+              </h2>
+              <span v-if="selectedSubcategory" class="px-2 py-1 bg-primary-100 text-primary-700 text-xs rounded-full">
+                子分类筛选中
+              </span>
+            </div>
             <div class="flex items-center space-x-4">
               <select
                 v-model="sortBy"
@@ -158,6 +187,7 @@ const isLoadingMore = ref(false)
 const currentPage = ref(1)
 const totalPages = ref(1)
 const hasMore = ref(true)
+const selectedSubcategory = ref(null) // 当前选中的子分类
 
 // 加载分类详情
 const loadCategoryData = async () => {
@@ -222,7 +252,13 @@ const loadCategoryPrompts = async (loadMore = false) => {
 
 // 处理排序变化
 const handleSortChange = () => {
-  loadCategoryPrompts()
+  if (selectedSubcategory.value) {
+    // 如果当前有选中的子分类，重新加载该子分类的提示词
+    loadSubcategoryPrompts(selectedSubcategory.value.id)
+  } else {
+    // 否则加载整个分类的提示词
+    loadCategoryPrompts()
+  }
 }
 
 // 加载更多提示词
@@ -241,35 +277,89 @@ const handleScroll = () => {
   
   // 距离底部100px时触发加载更多
   if (scrollTop + clientHeight >= scrollHeight - 100 && hasMore.value && !isLoadingMore.value) {
-    loadMorePrompts()
+    if (selectedSubcategory.value) {
+      loadMoreSubcategoryPrompts()
+    } else {
+      loadMorePrompts()
+    }
   }
 }
 
 // 处理子分类点击
 const handleSubcategoryClick = (subcategory) => {
-  // 可以跳转到子分类页面或过滤提示词
-  console.log('选择子分类:', subcategory)
-  // 如果需要过滤提示词，可以在这里实现
-  // loadSubcategoryPrompts(subcategory.id)
+  // 如果点击的是已选中的子分类，则清除筛选
+  if (selectedSubcategory.value?.id === subcategory.id) {
+    clearSubcategoryFilter()
+    return
+  }
+  
+  // 设置选中的子分类
+  selectedSubcategory.value = subcategory
+  
+  // 加载该子分类下的提示词
+  loadSubcategoryPrompts(subcategory.id)
 }
 
-// 加载子分类提示词（可选功能）
-const loadSubcategoryPrompts = async (subcategoryId) => {
-  isLoadingPrompts.value = true
+// 清除子分类筛选
+const clearSubcategoryFilter = () => {
+  selectedSubcategory.value = null
+  // 重新加载整个分类的提示词
+  loadCategoryPrompts()
+}
+
+// 加载子分类提示词
+const loadSubcategoryPrompts = async (subcategoryId, loadMore = false) => {
+  if (loadMore) {
+    isLoadingMore.value = true
+  } else {
+    isLoadingPrompts.value = true
+    currentPage.value = 1
+    hasMore.value = true
+  }
+  
   try {
     const params = {
       subcategory: subcategoryId,
       sort: sortBy.value,
-      limit: 50
+      limit: 12,
+      page: currentPage.value
     }
     const response = await promptsStore.fetchPrompts(params)
-    prompts.value = response.data.prompts || []
+    
+    if (loadMore) {
+      // 加载更多时，将新数据追加到现有列表
+      prompts.value = [...prompts.value, ...(response.data.prompts || [])]
+    } else {
+      // 首次加载或重新加载时，替换整个列表
+      prompts.value = response.data.prompts || []
+    }
+    
+    // 更新分页信息
+    if (response.data.pagination) {
+      currentPage.value = response.data.pagination.page
+      totalPages.value = response.data.pagination.totalPages
+      hasMore.value = currentPage.value < totalPages.value
+    }
   } catch (error) {
     console.error('加载子分类提示词失败:', error)
-    prompts.value = []
+    if (!loadMore) {
+      prompts.value = []
+    }
   } finally {
-    isLoadingPrompts.value = false
+    if (loadMore) {
+      isLoadingMore.value = false
+    } else {
+      isLoadingPrompts.value = false
+    }
   }
+}
+
+// 加载更多子分类提示词
+const loadMoreSubcategoryPrompts = async () => {
+  if (isLoadingMore.value || !hasMore.value || !selectedSubcategory.value) return
+  
+  currentPage.value += 1
+  await loadSubcategoryPrompts(selectedSubcategory.value.id, true)
 }
 
 // 获取提示词描述（从内容中提取摘要）
