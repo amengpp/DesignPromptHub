@@ -2,6 +2,7 @@ const { Op } = require('sequelize');
 const Prompt = require('../models/Prompt.js');
 const Category = require('../models/Category.js');
 const Subcategory = require('../models/Subcategory.js');
+const User = require('../models/User.js');
 
 // 全局搜索
 const globalSearch = async (req, res) => {
@@ -53,6 +54,11 @@ const globalSearch = async (req, res) => {
             model: Subcategory,
             as: 'subcategory',
             attributes: ['id', 'name']
+          },
+          {
+            model: User,
+            as: 'creator',
+            attributes: ['id', 'username', 'displayName']
           }
         ],
         order: [['usageCount', 'DESC']],
@@ -286,6 +292,11 @@ const advancedFilter = async (req, res) => {
           model: Subcategory,
           as: 'subcategory',
           attributes: ['id', 'name']
+        },
+        {
+          model: User,
+          as: 'creator',
+          attributes: ['id', 'username', 'displayName']
         }
       ],
       order: [[sortBy, sortOrder.toUpperCase()]],

@@ -3,6 +3,7 @@ const Joi = require('joi');
 const Prompt = require('../models/Prompt.js');
 const Category = require('../models/Category.js');
 const Subcategory = require('../models/Subcategory.js');
+const User = require('../models/User.js');
 
 // 验证模式
 const createPromptSchema = Joi.object({
@@ -83,6 +84,11 @@ const getPrompts = async (req, res) => {
           model: Subcategory,
           as: 'subcategory',
           attributes: ['id', 'name']
+        },
+        {
+          model: User,
+          as: 'creator',
+          attributes: ['id', 'username', 'displayName']
         }
       ],
       order: [[sortField, order]],
@@ -132,6 +138,11 @@ const getPromptById = async (req, res) => {
           model: Subcategory,
           as: 'subcategory',
           attributes: ['id', 'name', 'description']
+        },
+        {
+          model: User,
+          as: 'creator',
+          attributes: ['id', 'username', 'displayName']
         }
       ]
     });

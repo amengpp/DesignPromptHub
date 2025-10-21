@@ -36,7 +36,7 @@
                   <span v-if="prompt.subcategory">
                     {{ prompt.subcategory?.name }}
                   </span>
-                  <span>by {{ prompt.createdBy || '系统' }}</span>
+                  <span>by {{ prompt.creator.displayName || prompt.creator.username }}</span>
                   <span>{{ formatDate(prompt.createdAt) }}</span>
                 </div>
               </div>

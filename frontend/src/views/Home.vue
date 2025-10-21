@@ -163,7 +163,7 @@
               <h3 class="font-semibold text-gray-900 mb-2 line-clamp-2">{{ prompt.title }}</h3>
               <p class="text-gray-600 text-sm mb-4 line-clamp-3">{{ prompt.description }}</p>
               <div class="flex items-center justify-between text-sm">
-                <span class="text-gray-500">by {{ prompt.user?.displayName || prompt.user?.username }}</span>
+                <span class="text-gray-500">by {{ prompt.creator.displayName || prompt.creator.username }}</span>
                 <span class="text-primary-500 font-medium">查看详情 →</span>
               </div>
             </div>
