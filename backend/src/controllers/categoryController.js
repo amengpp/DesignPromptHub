@@ -69,24 +69,6 @@ const getCategoryById = async (req, res) => {
       order: [['sortOrder', 'ASC']]
     });
     
-    // 获取分类下的提示词
-    const prompts = await Prompt.findAll({
-      where: { categoryId: id, isPublic: true },
-      order: [['createdAt', 'DESC']],
-      include: [
-        {
-          model: Subcategory,
-          as: 'subcategory',
-          attributes: ['id', 'name']
-        },
-        {
-          model: User,
-          as: 'creator',
-          attributes: ['id', 'username', 'displayName']
-        }
-      ]
-    });
-    
     // 统计分类提示词数量
     const promptCount = await Prompt.count({
       where: { categoryId: id, isPublic: true }
@@ -105,8 +87,7 @@ const getCategoryById = async (req, res) => {
       success: true,
       data: {
         category: categoryData,
-        subcategories: subcategories,
-        prompts: prompts
+        subcategories: subcategories
       },
       message: '获取分类详情成功'
     });

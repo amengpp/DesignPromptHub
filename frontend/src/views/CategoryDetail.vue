@@ -60,7 +60,7 @@
             </div>
           </div>
 
-          <div v-if="promptsStore.isLoading" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div v-if="isLoadingPrompts" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             <div v-for="i in 6" :key="i" class="card animate-pulse">
               <div class="p-6">
                 <div class="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
@@ -85,17 +85,33 @@
                   <span class="text-xs text-gray-500">{{ formatDate(prompt.createdAt) }}</span>
                 </div>
                 <h3 class="font-semibold text-gray-900 mb-2 line-clamp-2">{{ prompt.title }}</h3>
-                <p class="text-gray-600 text-sm mb-4 line-clamp-3">{{ prompt.description }}</p>
+                <p class="text-gray-600 text-sm mb-4 line-clamp-3">{{ getPromptDescription(prompt) }}</p>
                 <div class="flex items-center justify-between text-sm">
-                  <span class="text-gray-500">by {{ prompt.user?.displayName || prompt.user?.username }}</span>
+                  <span class="text-gray-500">by {{ prompt.creator?.displayName || prompt.creator?.username || '未知用户' }}</span>
                   <span class="text-primary-500 font-medium">查看详情 →</span>
                 </div>
               </div>
             </div>
           </div>
 
+          <!-- 加载更多状态 -->
+          <div v-if="isLoadingMore" class="text-center py-8">
+            <div class="inline-flex items-center px-4 py-2 bg-gray-100 text-gray-600 rounded-lg">
+              <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-gray-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+              正在加载更多...
+            </div>
+          </div>
+
+          <!-- 没有更多数据 -->
+          <div v-else-if="prompts.length > 0 && !hasMore" class="text-center py-8">
+            <span class="text-gray-500 text-sm">没有更多数据了</span>
+          </div>
+
           <!-- 空状态 -->
-          <div v-if="prompts.length === 0 && !promptsStore.isLoading" class="text-center py-16">
+          <div v-if="prompts.length === 0 && !isLoadingPrompts" class="text-center py-16">
             <div class="text-gray-400 mb-4">
               <svg class="w-24 h-24 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
@@ -121,7 +137,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, watch } from 'vue'
+import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { usePromptsStore } from '@/stores/prompts'
@@ -137,28 +153,143 @@ const category = ref(null)
 const subcategories = ref([])
 const prompts = ref([])
 const sortBy = ref('newest')
+const isLoadingPrompts = ref(false)
+const isLoadingMore = ref(false)
+const currentPage = ref(1)
+const totalPages = ref(1)
+const hasMore = ref(true)
 
+// 加载分类详情
 const loadCategoryData = async () => {
   try {
     const response = await promptsStore.fetchCategoryDetail(categoryId.value)
     category.value = response.data.category
     subcategories.value = response.data.subcategories || []
-    prompts.value = response.data.prompts || []
+    // 加载分类下的提示词
+    await loadCategoryPrompts()
   } catch (error) {
     console.error('加载分类详情失败:', error)
   }
 }
 
-const handleSortChange = () => {
-  // 这里可以实现排序逻辑
-  console.log('排序方式:', sortBy.value)
+// 加载分类下的提示词
+const loadCategoryPrompts = async (loadMore = false) => {
+  if (loadMore) {
+    isLoadingMore.value = true
+  } else {
+    isLoadingPrompts.value = true
+    currentPage.value = 1
+    hasMore.value = true
+  }
+  
+  try {
+    const params = {
+      category: categoryId.value,
+      sort: sortBy.value,
+      limit: 12,
+      limit: 12,
+      page: currentPage.value
+    }
+    const response = await promptsStore.fetchPrompts(params)
+    
+    if (loadMore) {
+      // 加载更多时，将新数据追加到现有列表
+      prompts.value = [...prompts.value, ...(response.data.prompts || [])]
+    } else {
+      // 首次加载或重新加载时，替换整个列表
+      prompts.value = response.data.prompts || []
+    }
+    
+    // 更新分页信息
+    if (response.data.pagination) {
+      currentPage.value = response.data.pagination.page
+      totalPages.value = response.data.pagination.totalPages
+      hasMore.value = currentPage.value < totalPages.value
+    }
+  } catch (error) {
+    console.error('加载分类提示词失败:', error)
+    if (!loadMore) {
+      prompts.value = []
+    }
+  } finally {
+    if (loadMore) {
+      isLoadingMore.value = false
+    } else {
+      isLoadingPrompts.value = false
+    }
+  }
 }
 
+// 处理排序变化
+const handleSortChange = () => {
+  loadCategoryPrompts()
+}
+
+// 加载更多提示词
+const loadMorePrompts = async () => {
+  if (isLoadingMore.value || !hasMore.value) return
+  
+  currentPage.value += 1
+  await loadCategoryPrompts(true)
+}
+
+// 无限滚动处理
+const handleScroll = () => {
+  const scrollTop = document.documentElement.scrollTop || document.body.scrollTop
+  const scrollHeight = document.documentElement.scrollHeight || document.body.scrollHeight
+  const clientHeight = document.documentElement.clientHeight || window.innerHeight
+  
+  // 距离底部100px时触发加载更多
+  if (scrollTop + clientHeight >= scrollHeight - 100 && hasMore.value && !isLoadingMore.value) {
+    loadMorePrompts()
+  }
+}
+
+// 处理子分类点击
 const handleSubcategoryClick = (subcategory) => {
   // 可以跳转到子分类页面或过滤提示词
   console.log('选择子分类:', subcategory)
+  // 如果需要过滤提示词，可以在这里实现
+  // loadSubcategoryPrompts(subcategory.id)
 }
 
+// 加载子分类提示词（可选功能）
+const loadSubcategoryPrompts = async (subcategoryId) => {
+  isLoadingPrompts.value = true
+  try {
+    const params = {
+      subcategory: subcategoryId,
+      sort: sortBy.value,
+      limit: 50
+    }
+    const response = await promptsStore.fetchPrompts(params)
+    prompts.value = response.data.prompts || []
+  } catch (error) {
+    console.error('加载子分类提示词失败:', error)
+    prompts.value = []
+  } finally {
+    isLoadingPrompts.value = false
+  }
+}
+
+// 获取提示词描述（从内容中提取摘要）
+const getPromptDescription = (prompt) => {
+  if (prompt.description) {
+    return prompt.description
+  }
+  
+  // 从内容中提取前100个字符作为描述
+  if (prompt.content) {
+    // 移除Markdown格式和换行符
+    const plainText = prompt.content.replace(/[#*`\[\]]/g, '').replace(/\n/g, ' ')
+
+    return plainText.length > 100 ? plainText.substring(0, 100) + '...' : plainText
+  }
+  
+  return '暂无描述'
+}
+
+// 格式化日期
 const formatDate = (dateString) => {
   const date = new Date(dateString)
   return date.toLocaleDateString('zh-CN')
@@ -166,6 +297,13 @@ const formatDate = (dateString) => {
 
 onMounted(() => {
   loadCategoryData()
+  // 添加滚动监听
+  window.addEventListener('scroll', handleScroll)
+})
+
+onUnmounted(() => {
+  // 移除滚动监听
+  window.removeEventListener('scroll', handleScroll)
 })
 
 watch(categoryId, () => {
