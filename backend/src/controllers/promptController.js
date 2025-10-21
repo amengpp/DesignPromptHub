@@ -61,6 +61,16 @@ const getPrompts = async (req, res) => {
     // 分页配置
     const offset = (page - 1) * limit;
     
+    // 映射排序字段
+    const sortMapping = {
+      'newest': 'createdAt',
+      'popular': 'usageCount',
+      'title': 'title',
+      'rating': 'averageRating'
+    };
+    
+    const sortField = sortMapping[sort] || 'createdAt';
+    
     const { count, rows: prompts } = await Prompt.findAndCountAll({
       where,
       include: [
@@ -75,7 +85,7 @@ const getPrompts = async (req, res) => {
           attributes: ['id', 'name']
         }
       ],
-      order: [[sort, order]],
+      order: [[sortField, order]],
       limit: parseInt(limit),
       offset: parseInt(offset)
     });

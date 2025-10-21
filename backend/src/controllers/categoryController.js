@@ -1,5 +1,8 @@
 const Category = require('../models/Category.js');
 const Subcategory = require('../models/Subcategory.js');
+const Prompt = require('../models/Prompt.js');
+const User = require('../models/User.js');
+const { Op, Sequelize } = require('sequelize');
 
 // 获取所有分类及其子分类
 const getCategories = async (req, res) => {
@@ -12,6 +15,14 @@ const getCategories = async (req, res) => {
       }],
       order: [['sortOrder', 'ASC']]
     });
+    
+    // 统计每个分类的提示词数量
+    for (const category of categories) {
+      const promptCount = await Prompt.count({
+        where: { categoryId: category.id, isPublic: true }
+      });
+      category.dataValues.promptCount = promptCount;
+    }
 
     res.json({
       success: true,
@@ -35,17 +46,13 @@ const getCategories = async (req, res) => {
 const getCategoryById = async (req, res) => {
   try {
     const { id } = req.params;
-
-    const category = await Category.findByPk(id, {
-      include: [{
-        model: Subcategory,
-        as: 'subcategories',
-        attributes: ['id', 'name', 'description'],
-        order: [['sortOrder', 'ASC']]
-      }]
+    
+    // 获取分类信息
+    const categoryData = await Category.findByPk(id, {
+      attributes: ['id', 'name', 'description', 'type', 'sortOrder']
     });
-
-    if (!category) {
+    
+    if (!categoryData) {
       return res.status(404).json({
         success: false,
         error: {
@@ -54,10 +61,53 @@ const getCategoryById = async (req, res) => {
         }
       });
     }
+    
+    // 获取子分类
+    const subcategories = await Subcategory.findAll({
+      where: { categoryId: id },
+      attributes: ['id', 'name', 'description', 'sortOrder'],
+      order: [['sortOrder', 'ASC']]
+    });
+    
+    // 获取分类下的提示词
+    const prompts = await Prompt.findAll({
+      where: { categoryId: id, isPublic: true },
+      order: [['createdAt', 'DESC']],
+      include: [
+        {
+          model: Subcategory,
+          as: 'subcategory',
+          attributes: ['id', 'name']
+        },
+        {
+          model: User,
+          as: 'creator',
+          attributes: ['id', 'username', 'displayName']
+        }
+      ]
+    });
+    
+    // 统计分类提示词数量
+    const promptCount = await Prompt.count({
+      where: { categoryId: id, isPublic: true }
+    });
+    categoryData.dataValues.promptCount = promptCount;
+    
+    // 为每个子分类添加提示词数量
+    for (const subcategory of subcategories) {
+      const subPromptCount = await Prompt.count({
+        where: { subcategoryId: subcategory.id, isPublic: true }
+      });
+      subcategory.dataValues.promptCount = subPromptCount;
+    }
 
     res.json({
       success: true,
-      data: category,
+      data: {
+        category: categoryData,
+        subcategories: subcategories,
+        prompts: prompts
+      },
       message: '获取分类详情成功'
     });
 

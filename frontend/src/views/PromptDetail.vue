@@ -36,7 +36,7 @@
                   <span v-if="prompt.subcategory">
                     {{ prompt.subcategory?.name }}
                   </span>
-                  <span>by {{ prompt.user?.displayName || prompt.user?.username }}</span>
+                  <span>by {{ prompt.createdBy || '系统' }}</span>
                   <span>{{ formatDate(prompt.createdAt) }}</span>
                 </div>
               </div>
@@ -79,7 +79,12 @@
           <!-- 内容区域 -->
           <div class="card-body">
             <div class="prose max-w-none">
-              <pre class="whitespace-pre-wrap font-mono text-sm bg-gray-50 p-4 rounded-lg overflow-x-auto">{{ prompt.content }}</pre>
+              <div class="whitespace-pre-wrap bg-gray-50 p-6 rounded-lg overflow-x-auto">
+                <h2 class="text-xl font-semibold mb-4">{{ prompt.title }}</h2>
+                <div class="prose prose-sm">
+                  <p v-html="formatContent(prompt.content)"></p>
+                </div>
+              </div>
             </div>
           </div>
 
@@ -129,7 +134,8 @@ const prompt = ref(null)
 const loadPrompt = async () => {
   try {
     await promptsStore.fetchPromptDetail(route.params.id)
-    prompt.value = promptsStore.currentPrompt
+    // 根据API返回的数据结构，正确获取提示词详情
+    prompt.value = promptsStore.currentPrompt?.prompt || promptsStore.currentPrompt
   } catch (error) {
     console.error('加载提示词详情失败:', error)
   }
@@ -148,8 +154,34 @@ const handleCopy = async () => {
 }
 
 const formatDate = (dateString) => {
-  const date = new Date(dateString)
-  return date.toLocaleDateString('zh-CN')
+  if (!dateString) return '未知时间'
+  
+  try {
+    const date = new Date(dateString)
+    if (isNaN(date.getTime())) {
+      return '未知时间'
+    }
+    return date.toLocaleDateString('zh-CN', {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit'
+    })
+  } catch (error) {
+    console.error('日期格式化错误:', error)
+    return '未知时间'
+  }
+}
+
+const formatContent = (content) => {
+  if (!content) return ''
+  
+  // 将Markdown格式的内容转换为HTML
+  return content
+    .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
+    .replace(/\*([^*]+)\*/g, '<em>$1</em>')
+    .replace(/\n/g, '<br>')
+    .replace(/```([^`]+)```/g, '<pre><code>$1</code></pre>')
+    .replace(/`([^`]+)`/g, '<code>$1</code>')
 }
 
 onMounted(() => {
