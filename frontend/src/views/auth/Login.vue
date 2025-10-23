@@ -11,10 +11,7 @@
         </router-link>
         <h2 class="mt-6 text-3xl font-bold text-gray-900">登录您的账户</h2>
         <p class="mt-2 text-sm text-gray-600">
-          或
-          <router-link to="/register" class="font-medium text-primary-600 hover:text-primary-500">
-            注册新账户
-          </router-link>
+          <!-- 注册功能暂时禁用 -->
         </p>
       </div>
 
@@ -109,14 +106,7 @@
         </div>
       </form>
 
-      <!-- 演示账户信息 -->
-      <div class="mt-8 bg-blue-50 rounded-lg p-4">
-        <h4 class="text-sm font-medium text-blue-800 mb-2">演示账户</h4>
-        <div class="text-sm text-blue-700 space-y-1">
-          <p>用户名: <span class="font-mono">demo</span></p>
-          <p>密码: <span class="font-mono">demo123</span></p>
-        </div>
-      </div>
+
     </div>
   </div>
 </template>

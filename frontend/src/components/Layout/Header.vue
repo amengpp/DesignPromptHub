@@ -112,7 +112,8 @@
             </div>
           </div>
 
-          <!-- 登录/注册按钮 -->
+          <!-- 登录/注册按钮 - 暂时注释掉，管理人员可直接访问http://localhost:3000/login -->
+          <!-- 
           <div v-else class="flex items-center space-x-2">
             <router-link
               to="/login"
@@ -126,7 +127,8 @@
             >
               注册
             </router-link>
-          </div>
+          </div> 
+          -->
         </nav>
       </div>
 

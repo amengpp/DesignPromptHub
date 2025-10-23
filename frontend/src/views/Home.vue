@@ -43,7 +43,8 @@
               </svg>
               浏览分类
             </router-link>
-            <router-link
+            <!-- 注册入口暂时注释掉，管理人员可直接访问http://localhost:3000/login -->
+            <!-- <router-link
               v-if="!authStore.isAuthenticated"
               to="/register"
               class="inline-flex items-center px-6 py-3 bg-primary-500 text-white rounded-lg hover:bg-primary-600 font-medium"
@@ -52,7 +53,7 @@
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
               </svg>
               立即注册
-            </router-link>
+            </router-link> 
             <router-link
               v-else
               to="/create-prompt"
@@ -62,7 +63,7 @@
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
               </svg>
               创建提示词
-            </router-link>
+            </router-link>-->
           </div>
         </div>
       </div>

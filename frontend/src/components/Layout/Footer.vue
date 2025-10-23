@@ -39,8 +39,10 @@
 
         <!-- 用户相关 -->
         <div>
-          <h3 class="font-semibold text-gray-900 mb-4">用户</h3>
+          <h3 v-if="authStore.isAuthenticated" class="font-semibold text-gray-900 mb-4" >用户</h3>
           <ul class="space-y-2">
+            <!-- 登录/注册入口暂时注释掉，管理人员可直接访问http://localhost:3000/login -->
+            <!-- 
             <li v-if="!authStore.isAuthenticated">
               <router-link to="/login" class="text-gray-600 hover:text-primary-600">
                 登录
@@ -51,6 +53,7 @@
                 注册
               </router-link>
             </li>
+            -->
             <li v-if="authStore.isAuthenticated">
               <router-link to="/profile" class="text-gray-600 hover:text-primary-600">
                 个人资料
