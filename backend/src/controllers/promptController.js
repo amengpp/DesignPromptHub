@@ -41,6 +41,18 @@ const getPrompts = async (req, res) => {
     // 构建查询条件
     const where = {};
     
+    // 添加权限过滤逻辑：只显示公开的提示词，或者用户自己创建的私有提示词
+    if (req.user) {
+      // 登录用户：可以看到公开的提示词 和 自己创建的私有提示词
+      where[Op.or] = [
+        { isPublic: true },
+        { createdBy: req.user.id }
+      ];
+    } else {
+      // 未登录用户：只能看到公开的提示词
+      where.isPublic = true;
+    }
+    
     if (category) {
       where.categoryId = category;
     }
@@ -50,10 +62,26 @@ const getPrompts = async (req, res) => {
     }
     
     if (search) {
-      where[Op.or] = [
-        { title: { [Op.like]: `%${search}%` } },
-        { content: { [Op.like]: `%${search}%` } }
-      ];
+      // 将搜索条件与现有OR条件合并
+      if (where[Op.or]) {
+        const existingOrConditions = where[Op.or];
+        where[Op.or] = [
+          { [Op.and]: [
+              { [Op.or]: existingOrConditions },
+              { [Op.or]: [
+                  { title: { [Op.like]: `%${search}%` } },
+                  { content: { [Op.like]: `%${search}%` } }
+                ]
+              }
+            ]
+          }
+        ];
+      } else {
+        where[Op.or] = [
+          { title: { [Op.like]: `%${search}%` } },
+          { content: { [Op.like]: `%${search}%` } }
+        ];
+      }
     }
     
     if (tags) {
@@ -129,7 +157,23 @@ const getPromptById = async (req, res) => {
   try {
     const { id } = req.params;
 
-    const prompt = await Prompt.findByPk(id, {
+    // 构建查询条件，包含权限过滤
+    const where = { id };
+    
+    // 添加权限过滤逻辑
+    if (req.user) {
+      // 登录用户：可以看到公开的提示词 和 自己创建的私有提示词
+      where[Op.or] = [
+        { isPublic: true },
+        { createdBy: req.user.id }
+      ];
+    } else {
+      // 未登录用户：只能看到公开的提示词
+      where.isPublic = true;
+    }
+
+    const prompt = await Prompt.findOne({
+      where,
       include: [
         {
           model: Category,
@@ -154,7 +198,7 @@ const getPromptById = async (req, res) => {
         success: false,
         error: {
           code: 'PROMPT_NOT_FOUND',
-          message: '提示词不存在'
+          message: '提示词不存在或无权访问'
         }
       });
     }

@@ -25,13 +25,38 @@ const globalSearch = async (req, res) => {
 
     // 搜索提示词
     if (searchTypes.includes('all') || searchTypes.includes('prompts')) {
-      const where = {
+      // 构建包含权限过滤的查询条件
+      const where = {};
+      
+      // 添加权限过滤逻辑
+      if (req.user) {
+        where[Op.or] = [
+          { isPublic: true },
+          { createdBy: req.user.id }
+        ];
+      } else {
+        where.isPublic = true;
+      }
+      
+      // 将搜索条件与权限条件合并
+      const searchConditions = {
         [Op.or]: [
           { title: { [Op.like]: `%${q}%` } },
           { content: { [Op.like]: `%${q}%` } },
           { tags: { [Op.overlap]: [q] } }
         ]
       };
+      
+      // 合并权限条件和搜索条件
+      if (where[Op.or]) {
+        where[Op.and] = [
+          { [Op.or]: where[Op.or] },
+          searchConditions
+        ];
+        delete where[Op.or];
+      } else {
+        Object.assign(where, searchConditions);
+      }
 
       if (category) {
         where.categoryId = category;
@@ -252,6 +277,16 @@ const advancedFilter = async (req, res) => {
     } = req.query;
 
     const where = {};
+    
+    // 添加权限过滤逻辑
+    if (req.user) {
+      where[Op.or] = [
+        { isPublic: true },
+        { createdBy: req.user.id }
+      ];
+    } else {
+      where.isPublic = true;
+    }
 
     if (category) {
       where.categoryId = category;
