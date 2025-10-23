@@ -11,18 +11,17 @@
       
       <div class="container relative z-10 py-20 md:py-32">
         <div class="text-center max-w-3xl mx-auto">
-          <h1 class="text-4xl md:text-6xl font-extrabold mb-6 tracking-tight">
-            发现优质
+          <h1 class="text-3xl md:text-5xl font-extrabold mb-4 tracking-tight">
             <span class="text-primary-200 relative inline-block">
-              AI提示词
+              产品设计
               <svg class="absolute -bottom-2 left-0 w-full h-2" viewBox="0 0 100 10" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M0 5C20 10 35 0 50 5C65 10 80 0 100 5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
               </svg>
             </span>
+            AI提示词库
           </h1>
-          <p class="text-xl md:text-2xl text-primary-100 mb-10 leading-relaxed opacity-90">
-            专业的AI提示词管理平台，汇集海量高质量提示词模板，
-            帮助您提升工作效率和创造力
+          <p class="text-lg md:text-xl text-primary-100 mb-8 leading-relaxed opacity-90">
+            为产品设计师提供高质量AI提示词，助力快速生成专业设计素材
           </p>
           
           <!-- 搜索框 -->
@@ -153,17 +152,6 @@
               发现社区最新分享的高质量提示词
             </p>
           </div>
-          <div class="mt-4 md:mt-0">
-            <router-link
-              to="/search"
-              class="inline-flex items-center px-4 py-2 text-sm font-medium text-primary-600 hover:text-primary-800 transition-colors"
-            >
-              查看全部
-              <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
-              </svg>
-            </router-link>
-          </div>
         </div>
 
         <div v-if="promptsStore.isLoading" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -273,7 +261,7 @@ const authStore = useAuthStore()
 const promptsStore = usePromptsStore()
 
 const searchQuery = ref('')
-const popularTags = ref(['网站设计', '文案写作', '图像生成', '代码优化', '数据分析'])
+const popularTags = ref(['CRM', '电商', '教育', '金融', '医疗', '企业管理', '社交网络'])
 
 const featuredCategories = computed(() => {
   return promptsStore.categories.slice(0, 3)
