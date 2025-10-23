@@ -55,7 +55,8 @@ export const usePromptsStore = defineStore('prompts', () => {
     isLoading.value = true
     try {
       const response = await api.get(`/prompts/${promptId}`)
-      currentPrompt.value = response.data.data
+      // 修复数据提取路径，从API返回的数据结构中正确获取prompt对象
+      currentPrompt.value = response.data.data.prompt
       return response.data
     } catch (error) {
       throw error.response?.data || { message: '获取提示词详情失败' }
