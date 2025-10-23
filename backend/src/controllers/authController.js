@@ -269,4 +269,26 @@ const updateProfile = async (req, res) => {
   }
 };
 
-module.exports = { register, login, getCurrentUser, updateProfile };
+// 用户登出
+const logout = async (req, res) => {
+  try {
+    // 在JWT实现中，服务器端不需要特殊处理，只需通知客户端删除token
+    // 这里可以添加额外的安全措施，如将token加入黑名单（如果需要实现token黑名单机制）
+    
+    res.json({
+      success: true,
+      message: '登出成功'
+    });
+  } catch (error) {
+    console.error('登出错误:', error);
+    res.status(500).json({
+      success: false,
+      error: {
+        code: 'INTERNAL_ERROR',
+        message: '服务器内部错误'
+      }
+    });
+  }
+};
+
+module.exports = { register, login, getCurrentUser, updateProfile, logout };
