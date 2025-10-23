@@ -215,7 +215,16 @@ const formatDate = (dateString) => {
   return date.toLocaleDateString('zh-CN')
 }
 
-onMounted(() => {
+onMounted(async () => {
+  // 确保用户信息已加载
+  if (authStore.token && !authStore.user) {
+    try {
+      await authStore.getCurrentUser()
+    } catch (error) {
+      console.error('获取用户信息失败:', error)
+    }
+  }
+  
   // 初始化表单数据
   if (authStore.user) {
     form.username = authStore.user.username || ''

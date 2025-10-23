@@ -96,12 +96,22 @@ const router = createRouter({
 })
 
 // 路由守卫
-router.beforeEach((to, from, next) => {
+router.beforeEach(async (to, from, next) => {
   const authStore = useAuthStore()
   
   // 设置页面标题
   if (to.meta.title) {
     document.title = `${to.meta.title} - Prompt提示词管理平台`
+  }
+  
+  // 如果有token但没有用户信息，尝试获取用户信息
+  if (authStore.token && !authStore.user) {
+    try {
+      await authStore.getCurrentUser()
+    } catch (error) {
+      // 获取用户信息失败，清除token
+      authStore.clearAuth()
+    }
   }
   
   // 检查是否需要认证

@@ -72,7 +72,8 @@ export const useAuthStore = defineStore('auth', () => {
     isLoading.value = true
     try {
       const response = await api.get('/auth/me')
-      user.value = response.data.data
+      // 正确获取用户信息，应该是response.data.data.user而不是response.data.data
+      user.value = response.data.data.user
       return response.data
     } catch (error) {
       // 如果token无效，清除认证信息
