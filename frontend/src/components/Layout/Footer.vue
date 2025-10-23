@@ -43,7 +43,7 @@
 
         <!-- 用户相关 -->
         <div>
-          <h3 v-if="authStore.isAuthenticated" class="font-semibold text-gray-900 mb-4" >用户</h3>
+          <h3 v-if="authStore.isAuthenticated" class="font-semibold text-gray-900 mb-4">用户</h3>
           <!-- 移动端使用更紧凑的水平布局 -->
           <div v-if="authStore.isAuthenticated" class="flex flex-wrap gap-2 md:block">
             <router-link 
