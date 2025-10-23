@@ -18,31 +18,50 @@
         <!-- 快速链接 -->
         <div>
           <h3 class="font-semibold text-gray-900 mb-4">快速链接</h3>
-          <ul class="space-y-2">
-            <li>
-              <router-link to="/" class="text-gray-600 hover:text-primary-600">
-                首页
-              </router-link>
-            </li>
-            <li>
-              <router-link to="/categories" class="text-gray-600 hover:text-primary-600">
-                分类浏览
-              </router-link>
-            </li>
-            <li>
-              <router-link to="/search" class="text-gray-600 hover:text-primary-600">
-                搜索
-              </router-link>
-            </li>
-          </ul>
+          <!-- 移动端使用更紧凑的水平布局 -->
+          <div class="flex flex-wrap gap-2 md:block">
+            <router-link 
+              to="/" 
+              class="px-3 py-2 text-sm text-gray-600 hover:text-primary-600 bg-gray-50 rounded-md transition-colors md:block md:bg-transparent md:px-0 md:py-1"
+            >
+              首页
+            </router-link>
+            <router-link 
+              to="/categories" 
+              class="px-3 py-2 text-sm text-gray-600 hover:text-primary-600 bg-gray-50 rounded-md transition-colors md:block md:bg-transparent md:px-0 md:py-1"
+            >
+              分类浏览
+            </router-link>
+            <router-link 
+              to="/search" 
+              class="px-3 py-2 text-sm text-gray-600 hover:text-primary-600 bg-gray-50 rounded-md transition-colors md:block md:bg-transparent md:px-0 md:py-1"
+            >
+              搜索
+            </router-link>
+          </div>
         </div>
 
         <!-- 用户相关 -->
         <div>
           <h3 v-if="authStore.isAuthenticated" class="font-semibold text-gray-900 mb-4" >用户</h3>
+          <!-- 移动端使用更紧凑的水平布局 -->
+          <div v-if="authStore.isAuthenticated" class="flex flex-wrap gap-2 md:block">
+            <router-link 
+              to="/profile" 
+              class="px-3 py-2 text-sm text-gray-600 hover:text-primary-600 bg-gray-50 rounded-md transition-colors md:block md:bg-transparent md:px-0 md:py-1"
+            >
+              个人资料
+            </router-link>
+            <router-link 
+              to="/my-prompts" 
+              class="px-3 py-2 text-sm text-gray-600 hover:text-primary-600 bg-gray-50 rounded-md transition-colors md:block md:bg-transparent md:px-0 md:py-1"
+            >
+              我的提示词
+            </router-link>
+          </div>
+          <!-- 登录/注册入口暂时注释掉，管理人员可直接访问http://localhost:3000/login -->
+          <!-- 
           <ul class="space-y-2">
-            <!-- 登录/注册入口暂时注释掉，管理人员可直接访问http://localhost:3000/login -->
-            <!-- 
             <li v-if="!authStore.isAuthenticated">
               <router-link to="/login" class="text-gray-600 hover:text-primary-600">
                 登录
@@ -53,18 +72,8 @@
                 注册
               </router-link>
             </li>
-            -->
-            <li v-if="authStore.isAuthenticated">
-              <router-link to="/profile" class="text-gray-600 hover:text-primary-600">
-                个人资料
-              </router-link>
-            </li>
-            <li v-if="authStore.isAuthenticated">
-              <router-link to="/my-prompts" class="text-gray-600 hover:text-primary-600">
-                我的提示词
-              </router-link>
-            </li>
           </ul>
+          -->
         </div>
       </div>
 
