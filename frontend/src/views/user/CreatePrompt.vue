@@ -112,16 +112,7 @@
                 ></textarea>
               </div>
 
-              <!-- 描述 -->
-              <div>
-                <label class="form-label">描述（可选）</label>
-                <textarea
-                  v-model="form.description"
-                  rows="4"
-                  class="form-input"
-                  placeholder="请输入提示词的简要描述..."
-                ></textarea>
-              </div>
+              <!-- 描述字段已移除，后端不支持 -->
 
               <!-- 可见性 -->
               <div>
@@ -193,7 +184,6 @@ const form = reactive({
   subcategoryId: '',
   tags: [],
   content: '',
-  description: '',
   isPublic: true
 })
 
@@ -221,7 +211,16 @@ const handleCategoryChange = () => {
 
 const handleSubmit = async () => {
   try {
-    await promptsStore.createPrompt(form)
+    // 创建一个不包含description字段的表单数据副本
+    const promptData = {
+      title: form.title,
+      categoryId: form.categoryId,
+      subcategoryId: form.subcategoryId,
+      tags: form.tags,
+      content: form.content,
+      isPublic: form.isPublic
+    }
+    await promptsStore.createPrompt(promptData)
     router.push('/my-prompts')
   } catch (error) {
     console.error('创建提示词失败:', error)

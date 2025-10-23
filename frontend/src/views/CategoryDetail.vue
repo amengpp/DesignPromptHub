@@ -114,7 +114,7 @@
                   <span class="text-xs text-gray-500">{{ formatDate(prompt.createdAt) }}</span>
                 </div>
                 <h3 class="font-semibold text-gray-900 mb-2 line-clamp-2">{{ prompt.title }}</h3>
-                <p class="text-gray-600 text-sm mb-4 line-clamp-3">{{ getPromptDescription(prompt) }}</p>
+                <p class="text-gray-600 text-sm mb-4 line-clamp-3">{{ getPromptPreview(prompt) }}</p>
                 <div class="flex items-center justify-between text-sm">
                   <span class="text-gray-500">by {{ prompt.creator?.displayName || prompt.creator?.username || '未知用户' }}</span>
                   <span class="text-primary-500 font-medium">查看详情 →</span>
@@ -362,21 +362,9 @@ const loadMoreSubcategoryPrompts = async () => {
   await loadSubcategoryPrompts(selectedSubcategory.value.id, true)
 }
 
-// 获取提示词描述（从内容中提取摘要）
-const getPromptDescription = (prompt) => {
-  if (prompt.description) {
-    return prompt.description
-  }
-  
-  // 从内容中提取前100个字符作为描述
-  if (prompt.content) {
-    // 移除Markdown格式和换行符
-    const plainText = prompt.content.replace(/[#*`\[\]]/g, '').replace(/\n/g, ' ')
-
-    return plainText.length > 100 ? plainText.substring(0, 100) + '...' : plainText
-  }
-  
-  return '暂无描述'
+// 返回提示词预览内容，使用content字段的前100个字符
+const getPromptPreview = (prompt) => {
+  return prompt.content ? prompt.content.substring(0, 100) + (prompt.content.length > 100 ? '...' : '') : '无内容'
 }
 
 // 格式化日期

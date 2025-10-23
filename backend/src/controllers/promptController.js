@@ -11,7 +11,8 @@ const createPromptSchema = Joi.object({
   content: Joi.string().required(),
   categoryId: Joi.string().max(50).required(),
   subcategoryId: Joi.string().max(50).required(),
-  tags: Joi.array().items(Joi.string()).default([])
+  tags: Joi.array().items(Joi.string()).default([]),
+  isPublic: Joi.boolean().optional().default(true)
 });
 
 const updatePromptSchema = Joi.object({
@@ -19,7 +20,8 @@ const updatePromptSchema = Joi.object({
   content: Joi.string().optional(),
   categoryId: Joi.string().max(50).optional(),
   subcategoryId: Joi.string().max(50).optional(),
-  tags: Joi.array().items(Joi.string()).optional()
+  tags: Joi.array().items(Joi.string()).optional(),
+  isPublic: Joi.boolean().optional()
 });
 
 // 获取提示词列表
@@ -222,6 +224,8 @@ const createPrompt = async (req, res) => {
     // 生成唯一ID
     const promptId = `prompt-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
 
+    const { isPublic = true } = value;
+
     // 创建提示词
     const prompt = await Prompt.create({
       id: promptId,
@@ -230,6 +234,7 @@ const createPrompt = async (req, res) => {
       categoryId,
       subcategoryId,
       tags: tags || [],
+      isPublic,
       createdBy: req.user ? req.user.id : null
     });
 
@@ -358,10 +363,79 @@ const deletePrompt = async (req, res) => {
   }
 };
 
+// 获取当前用户创建的提示词
+const getMyPrompts = async (req, res) => {
+  try {
+    const { page = 1, limit = 20, sort = 'createdAt', order = 'desc' } = req.query;
+
+    // 构建查询条件，过滤出当前用户创建的提示词
+    const where = {
+      createdBy: req.user.id
+    };
+
+    // 分页配置
+    const offset = (page - 1) * limit;
+    
+    // 映射排序字段
+    const sortMapping = {
+      'newest': 'createdAt',
+      'popular': 'usageCount',
+      'title': 'title',
+      'rating': 'averageRating'
+    };
+    
+    const sortField = sortMapping[sort] || 'createdAt';
+    
+    const { count, rows: prompts } = await Prompt.findAndCountAll({
+      where,
+      include: [
+        {
+          model: Category,
+          as: 'category',
+          attributes: ['id', 'name', 'type']
+        },
+        {
+          model: Subcategory,
+          as: 'subcategory',
+          attributes: ['id', 'name']
+        }
+      ],
+      order: [[sortField, order]],
+      limit: parseInt(limit),
+      offset: parseInt(offset)
+    });
+
+    res.json({
+      success: true,
+      data: {
+        prompts,
+        pagination: {
+          page: parseInt(page),
+          limit: parseInt(limit),
+          total: count,
+          totalPages: Math.ceil(count / limit)
+        }
+      },
+      message: '获取用户提示词成功'
+    });
+
+  } catch (error) {
+    console.error('获取用户提示词错误:', error);
+    res.status(500).json({
+      success: false,
+      error: {
+        code: 'INTERNAL_ERROR',
+        message: '服务器内部错误'
+      }
+    });
+  }
+};
+
 module.exports = {
   getPrompts,
   getPromptById,
   createPrompt,
   updatePrompt,
-  deletePrompt
+  deletePrompt,
+  getMyPrompts
 };

@@ -118,16 +118,7 @@
                 ></textarea>
               </div>
 
-              <!-- 描述 -->
-              <div>
-                <label class="form-label">描述（可选）</label>
-                <textarea
-                  v-model="form.description"
-                  rows="4"
-                  class="form-input"
-                  placeholder="请输入提示词的简要描述..."
-                ></textarea>
-              </div>
+              <!-- 描述字段已移除，后端不支持 -->
 
               <!-- 可见性 -->
               <div>
@@ -215,7 +206,6 @@ const form = reactive({
   subcategoryId: '',
   tags: [],
   content: '',
-  description: '',
   isPublic: true
 })
 
@@ -252,7 +242,6 @@ const loadPrompt = async () => {
       form.subcategoryId = prompt.value.subcategoryId
       form.tags = [...(prompt.value.tags || [])]
       form.content = prompt.value.content
-      form.description = prompt.value.description || ''
       form.isPublic = prompt.value.isPublic
     }
   } catch (error) {
@@ -262,7 +251,16 @@ const loadPrompt = async () => {
 
 const handleSubmit = async () => {
   try {
-    await promptsStore.updatePrompt(route.params.id, form)
+    // 创建一个不包含description字段的数据对象
+    const updateData = {
+      title: form.title,
+      categoryId: form.categoryId,
+      subcategoryId: form.subcategoryId,
+      tags: form.tags,
+      content: form.content,
+      isPublic: form.isPublic
+    }
+    await promptsStore.updatePrompt(route.params.id, updateData)
     router.push('/my-prompts')
   } catch (error) {
     console.error('更新提示词失败:', error)

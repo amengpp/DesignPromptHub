@@ -4,7 +4,8 @@ const {
   getPromptById,
   createPrompt,
   updatePrompt,
-  deletePrompt
+  deletePrompt,
+  getMyPrompts
 } = require('../controllers/promptController.js');
 const { authenticateToken, optionalAuth } = require('../middleware/auth.js');
 
@@ -12,6 +13,9 @@ const router = express.Router();
 
 // 获取提示词列表（可选认证）
 router.get('/', optionalAuth, getPrompts);
+
+// 获取当前用户的提示词（需要认证）
+router.get('/my', authenticateToken, getMyPrompts);
 
 // 获取提示词详情（可选认证）
 router.get('/:id', optionalAuth, getPromptById);

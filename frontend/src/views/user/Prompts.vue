@@ -33,7 +33,8 @@
           <div
             v-for="prompt in userPrompts"
             :key="prompt.id"
-            class="card hover:shadow-lg transition-shadow"
+            class="card hover:shadow-lg transition-shadow cursor-pointer"
+            @click="handleViewDetail(prompt)"
           >
             <div class="p-6">
               <div class="flex items-center justify-between mb-3">
@@ -42,7 +43,7 @@
                 </span>
                 <div class="flex items-center space-x-2">
                   <button
-                    @click="handleEdit(prompt)"
+                    @click.stop="handleEdit(prompt)"
                     class="p-1 text-gray-400 hover:text-primary-600"
                   >
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -50,17 +51,17 @@
                     </svg>
                   </button>
                   <button
-                    @click="handleDelete(prompt)"
+                    @click.stop="handleDelete(prompt)"
                     class="p-1 text-gray-400 hover:text-red-600"
                   >
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                     </svg>
                   </button>
                 </div>
               </div>
               <h3 class="font-semibold text-gray-900 mb-2 line-clamp-2">{{ prompt.title }}</h3>
-              <p class="text-gray-600 text-sm mb-4 line-clamp-3">{{ prompt.description }}</p>
+              <p class="text-gray-600 text-sm mb-4 line-clamp-3">{{ prompt.content ? prompt.content.substring(0, 100) + (prompt.content.length > 100 ? '...' : '') : '无内容' }}</p>
               <div class="flex items-center justify-between text-sm">
                 <span class="text-gray-500">{{ formatDate(prompt.createdAt) }}</span>
                 <span class="text-primary-500 font-medium">查看详情 →</span>
@@ -109,6 +110,10 @@ const loadUserPrompts = async () => {
 
 const handleEdit = (prompt) => {
   router.push({ name: 'edit-prompt', params: { id: prompt.id } })
+}
+
+const handleViewDetail = (prompt) => {
+  router.push(`/prompts/${prompt.id}`)
 }
 
 const handleDelete = async (prompt) => {

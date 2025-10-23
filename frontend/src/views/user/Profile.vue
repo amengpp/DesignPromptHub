@@ -98,8 +98,8 @@
               </div>
             </div>
 
-            <!-- 统计信息 -->
-            <div class="card">
+            <!-- 统计信息 (当前已隐藏) -->
+            <div v-if="false" class="card">
               <div class="card-header">
                 <h3 class="font-semibold text-gray-900">统计信息</h3>
               </div>
