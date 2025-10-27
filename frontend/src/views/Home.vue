@@ -106,8 +106,13 @@
           >
             <div class="h-48 bg-gradient-to-br from-primary-100 to-primary-50 rounded-t-xl flex items-center justify-center overflow-hidden relative">
               <div class="absolute inset-0 bg-gradient-to-br opacity-0 group-hover:opacity-100 transition-opacity from-primary-600/10 to-primary-500/5"></div>
-              <div class="w-20 h-20 bg-primary-500 rounded-xl flex items-center justify-center transform transition-transform group-hover:scale-110">
-                <span class="text-white text-3xl font-bold">{{ category.name.charAt(0) }}</span>
+              <div class="w-20 h-20 rounded-xl flex items-center justify-center transform transition-transform group-hover:scale-110" :class="getCategoryIconClass(category.id)">
+                <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path v-if="category.id === 'web-app'" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                  <path v-else-if="category.id === 'web-website'" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                  <path v-else-if="category.id === 'mobile-app'" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                  <span v-else class="text-3xl font-bold">{{ category.name.charAt(0) }}</span>
+                </svg>
               </div>
               <div class="absolute bottom-4 right-4 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-xs font-medium text-gray-700 shadow-sm">
                 {{ category.promptCount || 0 }} 个提示词
@@ -266,6 +271,20 @@ const popularTags = ref(['CRM', '电商', '教育', '金融', '医疗', '企业�
 const featuredCategories = computed(() => {
   return promptsStore.categories.slice(0, 3)
 })
+
+// 根据分类ID获取对应的图标背景色
+const getCategoryIconClass = (categoryId) => {
+  switch (categoryId) {
+    case 'web-app':
+      return 'bg-blue-500'
+    case 'web-website':
+      return 'bg-purple-500'
+    case 'mobile-app':
+      return 'bg-green-500'
+    default:
+      return 'bg-primary-500'
+  }
+}
 
 const recentPrompts = computed(() => {
   return promptsStore.prompts.slice(0, 6)

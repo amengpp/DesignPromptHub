@@ -54,7 +54,16 @@
             >
               <div class="p-5">
                 <div class="flex items-center justify-between mb-2">
-                  <h3 class="font-semibold text-gray-900 hover:text-primary-600 transition-colors">{{ subcategory.name }}</h3>
+                  <div class="flex items-center">
+                    <div class="w-8 h-8 rounded-lg flex items-center justify-center mr-3" :class="getSubcategoryIconClass(subcategory.id)">
+                      <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path v-if="subcategory.id.includes('web')" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                        <path v-else-if="subcategory.id.includes('mobile')" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                        <span v-else class="text-sm font-bold">{{ subcategory.name.charAt(0) }}</span>
+                      </svg>
+                    </div>
+                    <h3 class="font-semibold text-gray-900 hover:text-primary-600 transition-colors">{{ subcategory.name }}</h3>
+                  </div>
                   <span 
                     v-if="selectedSubcategory?.id === subcategory.id"
                     class="text-primary-500 bg-primary-100 w-5 h-5 rounded-full flex items-center justify-center"
@@ -395,6 +404,19 @@ const getPromptPreview = (prompt) => {
 const formatDate = (dateString) => {
   const date = new Date(dateString)
   return date.toLocaleDateString('zh-CN')
+}
+
+// 根据子分类ID获取对应的图标背景色
+const getSubcategoryIconClass = (subcategoryId) => {
+  if (subcategoryId.includes('web')) {
+    return 'bg-blue-500'
+  } else if (subcategoryId.includes('mobile')) {
+    return 'bg-green-500'
+  } else if (subcategoryId.includes('website')) {
+    return 'bg-purple-500'
+  } else {
+    return 'bg-primary-500'
+  }
 }
 
 onMounted(() => {
