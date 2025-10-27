@@ -1,63 +1,72 @@
 <template>
   <MainLayout>
-    <div class="py-8">
+    <div class="py-16">
       <div class="container">
         <!-- 面包屑导航 -->
         <nav class="flex items-center space-x-2 text-sm text-gray-500 mb-6">
-          <router-link to="/" class="hover:text-primary-600">首页</router-link>
+          <router-link to="/" class="hover:text-primary-600 transition-colors">首页</router-link>
           <span>/</span>
-          <router-link to="/categories" class="hover:text-primary-600">分类</router-link>
+          <router-link to="/categories" class="hover:text-primary-600 transition-colors">分类</router-link>
           <span>/</span>
           <span class="text-gray-900">{{ category?.name }}</span>
         </nav>
 
         <!-- 分类信息 -->
-        <div v-if="promptsStore.isLoading" class="animate-pulse">
-          <div class="h-8 bg-gray-200 rounded w-1/3 mb-4"></div>
+        <div v-if="promptsStore.isLoading" class="animate-pulse mb-12">
+          <div class="h-10 bg-gray-200 rounded w-1/3 mb-4"></div>
           <div class="h-4 bg-gray-200 rounded w-1/2 mb-8"></div>
         </div>
 
-        <div v-else-if="category" class="mb-8">
-          <h1 class="text-3xl font-bold text-gray-900 mb-2">{{ category.name }}</h1>
-          <p class="text-gray-600">{{ category.description }}</p>
+        <div v-else-if="category" class="mb-12 text-center max-w-3xl mx-auto">
+          <h1 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4 relative inline-block">
+            {{ category.name }}
+            <span class="absolute -bottom-2 left-1/4 right-1/4 h-1 bg-primary-500 rounded-full"></span>
+          </h1>
+          <p class="text-gray-600 mt-6">{{ category.description }}</p>
         </div>
 
         <!-- 子分类 -->
-        <div v-if="subcategories.length > 0" class="mb-8">
-          <div class="flex items-center justify-between mb-4">
-            <h2 class="text-xl font-semibold text-gray-900">子分类</h2>
+        <div v-if="subcategories.length > 0" class="mb-12">
+          <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6">
+            <h2 class="text-xl md:text-2xl font-semibold text-gray-900 mb-2 sm:mb-0">子分类</h2>
             <button
               v-if="selectedSubcategory"
               @click="clearSubcategoryFilter"
-              class="text-sm text-primary-600 hover:text-primary-700 font-medium"
+              class="text-sm text-primary-600 hover:text-primary-700 font-medium flex items-center transition-colors"
             >
+              <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+              </svg>
               清除筛选
             </button>
           </div>
-          <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             <div
               v-for="subcategory in subcategories"
               :key="subcategory.id"
               :class="[
-                'card hover:shadow-lg transition-shadow cursor-pointer',
+                'bg-white rounded-xl overflow-hidden shadow-sm border transition-all duration-300 cursor-pointer hover:shadow-md',
                 selectedSubcategory?.id === subcategory.id 
                   ? 'border-2 border-primary-500 bg-primary-50' 
-                  : 'border border-gray-200'
+                  : 'border-gray-200 hover:border-primary-200'
               ]"
               @click="handleSubcategoryClick(subcategory)"
             >
-              <div class="p-4">
+              <div class="p-5">
                 <div class="flex items-center justify-between mb-2">
-                  <h3 class="font-semibold text-gray-900">{{ subcategory.name }}</h3>
+                  <h3 class="font-semibold text-gray-900 hover:text-primary-600 transition-colors">{{ subcategory.name }}</h3>
                   <span 
                     v-if="selectedSubcategory?.id === subcategory.id"
-                    class="text-primary-500"
+                    class="text-primary-500 bg-primary-100 w-5 h-5 rounded-full flex items-center justify-center"
                   >
                     ✓
                   </span>
                 </div>
-                <p class="text-gray-600 text-sm line-clamp-2">{{ subcategory.description }}</p>
-                <div class="mt-3 text-sm text-gray-500">
+                <p class="text-gray-600 text-sm line-clamp-2 mb-3">{{ subcategory.description }}</p>
+                <div class="flex items-center text-sm text-gray-500">
+                  <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+                  </svg>
                   {{ subcategory.promptCount || 0 }} 个提示词
                 </div>
               </div>
@@ -67,19 +76,19 @@
 
         <!-- 提示词列表 -->
         <div>
-          <div class="flex items-center justify-between mb-6">
-            <div class="flex items-center space-x-4">
-              <h2 class="text-xl font-semibold text-gray-900">
+          <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-8">
+            <div class="flex items-center space-x-4 mb-4 sm:mb-0">
+              <h2 class="text-xl md:text-2xl font-semibold text-gray-900">
                 {{ selectedSubcategory ? selectedSubcategory.name + ' 的提示词' : '提示词列表' }}
               </h2>
-              <span v-if="selectedSubcategory" class="px-2 py-1 bg-primary-100 text-primary-700 text-xs rounded-full">
+              <span v-if="selectedSubcategory" class="px-3 py-1 bg-primary-100 text-primary-700 text-xs rounded-full font-medium">
                 子分类筛选中
               </span>
             </div>
             <div class="flex items-center space-x-4">
               <select
                 v-model="sortBy"
-                class="form-input text-sm w-auto"
+                class="bg-white border border-gray-300 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all"
                 @change="handleSortChange"
               >
                 <option value="newest">最新</option>
@@ -99,33 +108,48 @@
             </div>
           </div>
 
-          <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             <div
               v-for="prompt in prompts"
               :key="prompt.id"
-              class="card hover:shadow-lg transition-shadow cursor-pointer"
+              class="bg-white border border-gray-200 rounded-xl overflow-hidden hover:shadow-lg transition-all duration-300 cursor-pointer group"
               @click="$router.push({ name: 'prompt-detail', params: { id: prompt.id } })"
             >
               <div class="p-6">
                 <div class="flex items-center justify-between mb-3">
-                  <span class="px-2 py-1 bg-primary-100 text-primary-700 text-xs rounded-full">
+                  <span class="px-3 py-1 bg-primary-100 text-primary-700 text-xs rounded-full font-medium">
                     {{ prompt.subcategory?.name || '未分类' }}
                   </span>
-                  <span class="text-xs text-gray-500">{{ formatDate(prompt.createdAt) }}</span>
+                  <span class="text-xs text-gray-500">
+                    <svg class="w-3 h-3 inline-block mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    {{ formatDate(prompt.createdAt) }}
+                  </span>
                 </div>
-                <h3 class="font-semibold text-gray-900 mb-2 line-clamp-2">{{ prompt.title }}</h3>
+                <h3 class="font-semibold text-lg text-gray-900 mb-2 line-clamp-2 group-hover:text-primary-600 transition-colors">{{ prompt.title }}</h3>
                 <p class="text-gray-600 text-sm mb-4 line-clamp-3">{{ getPromptPreview(prompt) }}</p>
-                <div class="flex items-center justify-between text-sm">
-                  <span class="text-gray-500">by {{ prompt.creator?.displayName || prompt.creator?.username || '未知用户' }}</span>
-                  <span class="text-primary-500 font-medium">查看详情 →</span>
+                <div class="pt-3 border-t border-gray-100 flex items-center justify-between text-sm">
+                  <div class="flex items-center">
+                    <div class="w-6 h-6 bg-gray-100 rounded-full flex items-center justify-center mr-2">
+                      <span class="text-xs font-medium text-gray-600">{{ (prompt.creator?.displayName || prompt.creator?.username || '未知用户').charAt(0) }}</span>
+                    </div>
+                    <span class="text-gray-500">{{ prompt.creator?.displayName || prompt.creator?.username || '未知用户' }}</span>
+                  </div>
+                  <span class="text-primary-500 font-medium inline-flex items-center group-hover:translate-x-1 transition-transform">
+                    查看详情 
+                    <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                    </svg>
+                  </span>
                 </div>
               </div>
             </div>
           </div>
 
           <!-- 加载更多状态 -->
-          <div v-if="isLoadingMore" class="text-center py-8">
-            <div class="inline-flex items-center px-4 py-2 bg-gray-100 text-gray-600 rounded-lg">
+          <div v-if="isLoadingMore" class="text-center py-12">
+            <div class="inline-flex items-center px-6 py-3 bg-gray-50 text-gray-600 rounded-lg border border-gray-200">
               <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-gray-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                 <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                 <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
@@ -149,15 +173,15 @@
             <h3 class="text-lg font-medium text-gray-900 mb-2">暂无提示词</h3>
             <p class="text-gray-500 mb-6">当前分类下还没有提示词</p>
             <router-link
-              v-if="authStore.isAuthenticated"
-              to="/create-prompt"
-              class="inline-flex items-center px-6 py-3 bg-primary-500 text-white rounded-lg hover:bg-primary-600 font-medium"
-            >
-              <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-              </svg>
-              创建第一个提示词
-            </router-link>
+                v-if="authStore.isAuthenticated"
+                to="/create-prompt"
+                class="inline-flex items-center px-6 py-3 bg-primary-500 text-white rounded-lg hover:bg-primary-600 font-medium shadow-sm hover:shadow"
+              >
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                </svg>
+                创建第一个提示词
+              </router-link>
           </div>
         </div>
       </div>
