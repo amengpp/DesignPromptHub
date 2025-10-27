@@ -24,7 +24,7 @@ dotenv.config();
 require('./models/index.js');
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 8000;
 
 // 安全中间件
 app.use(helmet());
@@ -32,7 +32,7 @@ app.use(compression());
 
 // CORS配置
 app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:5173',
+  origin: [process.env.FRONTEND_URL || 'http://localhost:5173', 'http://localhost:3000', 'https://design-prompt-hub-frontend.vercel.app'],
   credentials: true
 }));
 
@@ -85,7 +85,7 @@ app.use(notFoundHandler);
 app.use(errorHandler);
 
 // 启动服务器
-if (process.env.NODE_ENV !== 'test') {
+if (process.env.NODE_ENV !== 'test' && process.env.NODE_ENV !== 'production') {
   app.listen(PORT, () => {
     console.log(`🚀 服务器运行在端口 ${PORT}`);
     console.log(`📊 环境: ${process.env.NODE_ENV || 'development'}`);
@@ -93,4 +93,5 @@ if (process.env.NODE_ENV !== 'test') {
   });
 }
 
+// 导出app供Vercel使用
 module.exports = app;
