@@ -14,5 +14,7 @@
   ],
   "env": {
     "NODE_ENV": "production"
-  }
+  },
+  "installCommand": "npm install --legacy-peer-deps && npm install mysql2@^3.6.0",
+  "buildCommand": "npm run lint"
 }

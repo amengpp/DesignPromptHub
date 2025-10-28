@@ -14,8 +14,11 @@
 
 1. 登录 Vercel 控制台
 2. 点击右上角的 **New Project**
-3. 从 Git 仓库导入您的项目
-4. 选择后端目录 `backend` 作为根目录
+3. 从 Git 仓库列表中选择您的项目
+4. 在项目配置页面，向下滚动找到**Root Directory**（根目录）选项
+5. 在输入框中输入 `backend`
+
+如果找不到Root Directory选项，请在导入项目后点击**Configure Project**按钮，然后在项目设置页面中查找该选项。
 
 ### 步骤 2: 配置环境变量
 
@@ -50,8 +53,11 @@
 ### 步骤 1: 导入项目
 
 1. 再次点击 **New Project**
-2. 从同一 Git 仓库导入
-3. 选择前端目录 `frontend` 作为根目录
+2. 从同一 Git 仓库列表中选择您的项目
+3. 在项目配置页面，向下滚动找到**Root Directory**（根目录）选项
+4. 在输入框中输入 `frontend`
+
+如果找不到Root Directory选项，请在导入项目后点击**Configure Project**按钮，然后在项目设置页面中查找该选项。
 
 ### 步骤 2: 配置环境变量
 

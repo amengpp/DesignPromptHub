@@ -1,3 +1,5 @@
+// 显式导入mysql2以确保在Vercel环境中正确加载
+const mysql2 = require('mysql2');
 const { Sequelize } = require('sequelize');
 const dotenv = require('dotenv');
 
@@ -18,15 +20,8 @@ const sequelize = new Sequelize({
     max: 5, // 减少连接池大小
     min: 0,
     acquire: 10000, // 减少获取超时时间
-    idle: 5000, // 减少空闲超时时间
-    // 无服务器环境中启用连接验证
-    validate: {
-      testOnBorrow: true,
-      testOnReturn: false,
-      testOnCreate: true,
-      testWhileIdle: true,
-      timeBetweenEvictionRunsMillis: 10000
-    }
+    idle: 5000 // 减少空闲超时时间
+    // 移除不支持的validate配置
   },
   define: {
     timestamps: true,
@@ -64,10 +59,9 @@ const testConnection = async () => {
 // 按需连接数据库
 const ensureConnection = async () => {
   try {
-    // 检查连接是否已建立或是否需要重新连接
-    if (!sequelize.connectionManager.pool || sequelize.connectionManager.pool.numUsed() === 0) {
-      await testConnection();
-    }
+    // 使用更安全的方式检查连接状态，直接尝试验证连接
+    await sequelize.authenticate();
+    console.log('✅ 数据库连接正常');
   } catch (error) {
     console.error('❌ 确保数据库连接失败:', error.message);
     throw error;
