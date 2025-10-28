@@ -12,7 +12,8 @@ const createPromptSchema = Joi.object({
   categoryId: Joi.string().max(50).required(),
   subcategoryId: Joi.string().max(50).required(),
   tags: Joi.array().items(Joi.string()).default([]),
-  isPublic: Joi.boolean().optional().default(true)
+  isPublic: Joi.boolean().optional().default(true),
+  imageUrl: Joi.string().max(255).optional().allow(null)
 });
 
 const updatePromptSchema = Joi.object({
@@ -21,7 +22,8 @@ const updatePromptSchema = Joi.object({
   categoryId: Joi.string().max(50).optional(),
   subcategoryId: Joi.string().max(50).optional(),
   tags: Joi.array().items(Joi.string()).optional(),
-  isPublic: Joi.boolean().optional()
+  isPublic: Joi.boolean().optional(),
+  imageUrl: Joi.string().max(255).optional().allow(null)
 });
 
 // 获取提示词列表
@@ -268,7 +270,7 @@ const createPrompt = async (req, res) => {
     // 生成唯一ID
     const promptId = `prompt-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
 
-    const { isPublic = true } = value;
+    const { isPublic = true, imageUrl = null } = value;
 
     // 创建提示词
     const prompt = await Prompt.create({
@@ -279,6 +281,7 @@ const createPrompt = async (req, res) => {
       subcategoryId,
       tags: tags || [],
       isPublic,
+      imageUrl,
       createdBy: req.user ? req.user.id : null
     });
 

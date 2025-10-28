@@ -104,6 +104,18 @@
             </div>
           </div>
 
+          <!-- 图片展示区域 -->
+          <div v-if="prompt.imageUrl" class="p-6 border-t border-gray-100 bg-gray-50">
+            <div class="rounded-xl overflow-hidden shadow-sm">
+              <img 
+                :src="prompt.imageUrl" 
+                :alt="prompt.title" 
+                class="w-full h-auto object-cover hover:scale-105 transition-transform duration-300 ease-in-out"
+                loading="lazy"
+              />
+            </div>
+          </div>
+
           <!-- 内容区域 -->
           <div class="p-6">
             <div class="whitespace-pre-wrap bg-white p-6 rounded-xl overflow-x-auto border border-gray-100 shadow-sm">

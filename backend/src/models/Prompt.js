@@ -48,6 +48,11 @@ const Prompt = sequelize.define('Prompt', {
     type: DataTypes.INTEGER,
     allowNull: true,
     field: 'created_by'
+  },
+  imageUrl: {
+    type: DataTypes.STRING(255),
+    allowNull: true,
+    field: 'image_url'
   }
 }, {
   tableName: 'prompts',

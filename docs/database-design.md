@@ -64,6 +64,7 @@ CREATE TABLE prompts (
     average_rating DECIMAL(3,2) DEFAULT 0.00,
     is_public BOOLEAN DEFAULT TRUE,
     created_by INT,
+    image_url VARCHAR(255), -- 提示词对应生成的图片存储地址
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (category_id) REFERENCES categories(id),

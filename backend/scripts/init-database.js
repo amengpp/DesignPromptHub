@@ -127,6 +127,7 @@ async function initializeDatabase() {
       averageRating: prompt.averageRating || 0.00,
       isPublic: prompt.isPublic !== undefined ? prompt.isPublic : true,
       createdBy: 1, // 设置默认用户ID
+      imageUrl: prompt.imageUrl || null, // 添加imageUrl字段
       createdAt: prompt.createdAt || new Date(),
       updatedAt: prompt.updatedAt || new Date()
     }));
